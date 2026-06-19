@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillCraft — Responsive Landing Page</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #0d0d14;
+    --surface:   #14141f;
+    --panel:     #1a1a2e;
+    --teal:      #00c9a7;
+    --violet:    #7c3aed;
+    --rose:      #e8405a;
+    --text:      #e8e8f0;
+    --muted:     #7a7a9a;
+    --nav-h:     68px;
+    --nav-bg:    rgba(13,13,20,0);
+    --nav-bg-scrolled: rgba(13,13,20,0.92);
+    --nav-blur:  blur(14px);
+    --radius:    12px;
+    --font-display: 'Syne', sans-serif;
+    --font-body:    'Space Grotesk', sans-serif;
+    --ease:      cubic-bezier(.4,0,.2,1);
+  }
+
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); line-height: 1.6; overflow-x: hidden; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    height: var(--nav-h);
+    background: var(--nav-bg);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-bottom: 1px solid transparent;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 clamp(1.5rem,5vw,4rem);
+    transition: background .35s var(--ease), border-color .35s var(--ease), backdrop-filter .35s var(--ease);
+  }
+  nav.scrolled {
+    background: var(--nav-bg-scrolled);
+    backdrop-filter: var(--nav-blur);
+    -webkit-backdrop-filter: var(--nav-blur);
+    border-color: rgba(255,255,255,.07);
+  }
+
+  .nav-logo {
+    font-family: var(--font-display); font-size: 1.3rem; font-weight: 800;
+    color: var(--text); text-decoration: none; letter-spacing: -.02em;
+    display: flex; align-items: center; gap: .45rem;
+  }
+  .nav-logo span { color: var(--teal); }
+
+  .nav-links {
+    display: flex; gap: .25rem; align-items: center; list-style: none;
+  }
+  .nav-links a {
+    display: block; padding: .45rem .85rem; border-radius: 8px;
+    font-size: .875rem; font-weight: 500; color: var(--muted);
+    text-decoration: none; position: relative;
+    transition: color .2s var(--ease), background .2s var(--ease);
+  }
+  .nav-links a::after {
+    content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
+    width: 0; height: 2px; background: var(--teal); border-radius: 2px;
+    transition: width .25s var(--ease);
+  }
+  .nav-links a:hover { color: var(--text); background: rgba(255,255,255,.05); }
+  .nav-links a:hover::after { width: 55%; }
+  .nav-links a.active { color: var(--text); }
+  .nav-links a.active::after { width: 55%; }
+
+  .nav-cta {
+    padding: .5rem 1.2rem !important; border-radius: 8px !important;
+    background: var(--teal) !important; color: #0d0d14 !important;
+    font-weight: 600 !important;
+    box-shadow: 0 0 0 0 rgba(0,201,167,.4);
+    transition: background .2s var(--ease), transform .2s var(--ease), box-shadow .2s var(--ease) !important;
+  }
+  .nav-cta::after { display: none !important; }
+  .nav-cta:hover { background: #00e0bc !important; transform: translateY(-1px); box-shadow: 0 0 0 6px rgba(0,201,167,.15) !important; }
+
+  /* hamburger */
+  .nav-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: .4rem; }
+  .nav-toggle span { display: block; width: 24px; height: 2px; background: var(--text); border-radius: 2px; transition: transform .3s var(--ease), opacity .3s var(--ease); }
+  .nav-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .nav-toggle.open span:nth-child(2) { opacity: 0; }
+  .nav-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* mobile drawer */
+  @media (max-width: 720px) {
+    .nav-toggle { display: flex; }
+    .nav-links {
+      position: fixed; top: var(--nav-h); left: 0; right: 0;
+      flex-direction: column; gap: .5rem; padding: 1.25rem 1.5rem 2rem;
+      background: rgba(13,13,20,.97); backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,.07);
+      transform: translateY(-110%); opacity: 0;
+      transition: transform .35s var(--ease), opacity .25s var(--ease);
+    }
+    .nav-links.open { transform: translateY(0); opacity: 1; }
+    .nav-links a { font-size: 1rem; padding: .65rem 1rem; }
+  }
+
+  /* ── SECTIONS ── */
+  section { padding: 7rem clamp(1.5rem,6vw,5rem); }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
+    position: relative; overflow: hidden; padding-top: calc(var(--nav-h) + 4rem);
+  }
+
+  /* animated gradient orbs */
+  .orb {
+    position: absolute; border-radius: 50%; filter: blur(90px); opacity: .25; pointer-events: none;
+    animation: drift 12s ease-in-out infinite alternate;
+  }
+  .orb-1 { width: 520px; height: 520px; background: var(--violet); top: -100px; right: -100px; animation-delay: 0s; }
+  .orb-2 { width: 380px; height: 380px; background: var(--teal);   bottom: 0; left: -60px;  animation-delay: -5s; }
+  .orb-3 { width: 280px; height: 280px; background: var(--rose);   top: 40%; left: 55%;    animation-delay: -3s; }
+  @keyframes drift { from { transform: translate(0,0) scale(1); } to { transform: translate(30px,30px) scale(1.07); } }
+
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: .5rem;
+    font-size: .8rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--teal); margin-bottom: 1.5rem;
+  }
+  .hero-eyebrow::before { content: ''; display: block; width: 28px; height: 2px; background: var(--teal); border-radius: 2px; }
+
+  h1 {
+    font-family: var(--font-display); font-size: clamp(2.8rem,7vw,6rem); font-weight: 800;
+    line-height: 1.0; letter-spacing: -.03em; max-width: 800px; margin-bottom: 1.5rem;
+  }
+  h1 em { font-style: normal; color: var(--teal); }
+
+  .hero-desc { max-width: 520px; color: var(--muted); font-size: 1.1rem; margin-bottom: 2.5rem; }
+
+  .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: .5rem;
+    padding: .8rem 1.75rem; border-radius: var(--radius); font-family: var(--font-body);
+    font-size: .95rem; font-weight: 600; text-decoration: none; cursor: pointer; border: none;
+    transition: transform .2s var(--ease), box-shadow .2s var(--ease), background .2s var(--ease);
+  }
+  .btn-primary { background: var(--teal); color: #0d0d14; }
+  .btn-primary:hover { background: #00e0bc; transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,201,167,.35); }
+  .btn-ghost { background: transparent; color: var(--text); border: 1.5px solid rgba(255,255,255,.18); }
+  .btn-ghost:hover { border-color: var(--teal); color: var(--teal); transform: translateY(-2px); }
+
+  /* ── FEATURES ── */
+  #features { background: var(--surface); }
+  .section-label { font-size: .78rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--teal); margin-bottom: .75rem; }
+  h2 { font-family: var(--font-display); font-size: clamp(1.8rem,4vw,3rem); font-weight: 800; letter-spacing: -.02em; margin-bottom: 1rem; }
+  .section-sub { color: var(--muted); max-width: 540px; margin-bottom: 3.5rem; font-size: 1.05rem; }
+
+  .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap: 1.5rem; }
+  .card {
+    background: var(--panel); border: 1px solid rgba(255,255,255,.06); border-radius: var(--radius);
+    padding: 2rem; position: relative; overflow: hidden;
+    transition: transform .25s var(--ease), border-color .25s var(--ease), box-shadow .25s var(--ease);
+  }
+  .card::before {
+    content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(0,201,167,.08) 0%, transparent 60%);
+    opacity: 0; transition: opacity .3s var(--ease);
+  }
+  .card:hover { transform: translateY(-5px); border-color: rgba(0,201,167,.3); box-shadow: 0 12px 40px rgba(0,0,0,.4); }
+  .card:hover::before { opacity: 1; }
+  .card-icon { width: 44px; height: 44px; border-radius: 10px; background: rgba(0,201,167,.12); display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem; font-size: 1.3rem; }
+  .card h3 { font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; margin-bottom: .5rem; }
+  .card p { font-size: .9rem; color: var(--muted); line-height: 1.65; }
+
+  /* ── STATS ── */
+  #stats { background: var(--bg); }
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 2rem; }
+  .stat-item { text-align: center; padding: 2rem 1rem; border: 1px solid rgba(255,255,255,.06); border-radius: var(--radius); background: var(--surface); }
+  .stat-num { font-family: var(--font-display); font-size: 3rem; font-weight: 800; color: var(--teal); line-height: 1; }
+  .stat-label { font-size: .85rem; color: var(--muted); margin-top: .4rem; }
+
+  /* ── CTA ── */
+  #cta {
+    background: linear-gradient(135deg, rgba(124,58,237,.15), rgba(0,201,167,.1));
+    border-top: 1px solid rgba(255,255,255,.06); text-align: center;
+  }
+  #cta h2 { max-width: 600px; margin: 0 auto 1rem; }
+  #cta p { color: var(--muted); max-width: 480px; margin: 0 auto 2.5rem; }
+  #cta .hero-actions { justify-content: center; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--surface); border-top: 1px solid rgba(255,255,255,.06);
+    padding: 2.5rem clamp(1.5rem,6vw,5rem);
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+  }
+  footer p { color: var(--muted); font-size: .85rem; }
+
+  /* ── SCROLL REVEAL ── */
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity .6s var(--ease), transform .6s var(--ease); }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .orb, .reveal { animation: none !important; transition: none !important; opacity: 1 !important; transform: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav id="navbar">
+  <a href="#hero" class="nav-logo">Skill<span>Craft</span></a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#hero"     class="active">Home</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#stats">   Results</a></li>
+    <li><a href="#cta">     Pricing</a></li>
+    <li><a href="#cta" class="nav-cta">Get Started</a></li>
+  </ul>
+  <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- ── HERO ── -->
+<section id="hero">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="hero-eyebrow">Task 01 — Responsive Landing Page</div>
+  <h1>Build skills that<br><em>actually stick.</em></h1>
+  <p class="hero-desc">SkillCraft is the hands-on platform where developers move from theory to shipped projects — fast, guided, and without the fluff.</p>
+  <div class="hero-actions">
+    <a href="#features" class="btn btn-primary">Explore Features ↓</a>
+    <a href="#cta" class="btn btn-ghost">See Pricing</a>
+  </div>
+</section>
+
+<!-- ── FEATURES ── -->
+<section id="features">
+  <p class="section-label reveal">What you get</p>
+  <h2 class="reveal">Everything a developer needs to grow</h2>
+  <p class="section-sub reveal">Curated projects, live feedback, and a community that ships — not just studies.</p>
+  <div class="features-grid">
+    <div class="card reveal">
+      <div class="card-icon">⚡</div>
+      <h3>Guided Projects</h3>
+      <p>Real-world tasks scoped to your skill level, broken into milestones you can finish in a weekend.</p>
+    </div>
+    <div class="card reveal">
+      <div class="card-icon">🎯</div>
+      <h3>Instant Feedback</h3>
+      <p>Automated checks plus mentor reviews catch bad habits before they calcify into technical debt.</p>
+    </div>
+    <div class="card reveal">
+      <div class="card-icon">🗺️</div>
+      <h3>Clear Roadmaps</h3>
+      <p>From fundamentals to full-stack, every path is sequenced so you always know what to learn next.</p>
+    </div>
+    <div class="card reveal">
+      <div class="card-icon">🤝</div>
+      <h3>Peer Community</h3>
+      <p>Code reviews, pair sessions, and accountability groups — because shipping alone is hard.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── STATS ── -->
+<section id="stats">
+  <p class="section-label reveal" style="text-align:center">By the numbers</p>
+  <h2 class="reveal" style="text-align:center;margin-bottom:3rem">Results that speak</h2>
+  <div class="stats-grid">
+    <div class="stat-item reveal"><div class="stat-num">40k+</div><div class="stat-label">Active learners</div></div>
+    <div class="stat-item reveal"><div class="stat-num">81</div><div class="stat-label">Curated tasks</div></div>
+    <div class="stat-item reveal"><div class="stat-num">94%</div><div class="stat-label">Completion rate</div></div>
+    <div class="stat-item reveal"><div class="stat-num">4.9★</div><div class="stat-label">Average rating</div></div>
+  </div>
+</section>
+
+<!-- ── CTA ── -->
+<section id="cta">
+  <h2 class="reveal">Ready to level up?</h2>
+  <p class="reveal">Join thousands of developers building real things, every week.</p>
+  <div class="hero-actions reveal">
+    <a href="#hero" class="btn btn-primary">Start for Free</a>
+    <a href="#features" class="btn btn-ghost">Browse Tasks</a>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <p>© 2025 SkillCraft Technology. All rights reserved.</p>
+  <p style="color:var(--muted);font-size:.85rem">Made for Task 01 · Responsive Landing Page</p>
+</footer>
+
+<script>
+  /* ── Scroll: nav color change ── */
+  const navbar = document.getElementById('navbar');
+  const onScroll = () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 40);
+    /* active link */
+    const sections = document.querySelectorAll('section[id]');
+    let current = '';
+    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 100) current = s.id; });
+    document.querySelectorAll('.nav-links a').forEach(a => {
+      a.classList.remove('active');
+      if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+    });
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  /* ── Mobile menu ── */
+  const toggle = document.getElementById('navToggle');
+  const links  = document.getElementById('navLinks');
+  toggle.addEventListener('click', () => {
+    toggle.classList.toggle('open');
+    links.classList.toggle('open');
+  });
+  links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    toggle.classList.remove('open'); links.classList.remove('open');
+  }));
+
+  /* ── Scroll reveal ── */
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
